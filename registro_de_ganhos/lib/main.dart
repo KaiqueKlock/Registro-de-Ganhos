@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:registro_de_ganhos/add_Page.dart';
+import 'package:registro_de_ganhos/GanhoFormPage.dart';
+import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/home_page.dart';
 
 void main() {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(title: 'Registro de Ganhos'),
       routes: {
-        '/add' : (context) => AddPage(),
+        '/add' : (context) => Ganhoformpage(),
         '/home' : (context) => MyHomePage(title: 'Registro de Ganhos',),},
     );
   }

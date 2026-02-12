@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:registro_de_ganhos/GanhoFormPage.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
+import 'package:registro_de_ganhos/Repo/ganho_repository.dart';
 import 'package:registro_de_ganhos/Widgets/user_inputs.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -12,10 +14,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 List<Ganho> ganhos = [];
-
+final GanhoRepository ganhoRepository = GanhoRepository();
 void deleteGanhos(int index){
+  ganhoRepository.removeGanho(ganhos[index]);
   setState(() {
-    ganhos.removeAt(index);
+    ganhos = ganhoRepository.getGanhos();
   });
 }
   @override
@@ -95,10 +98,11 @@ void deleteGanhos(int index){
                               IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () async {
-                            final result = await Navigator.pushNamed(context, '/add', arguments: ganhos[index]);
+                            final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => Ganhoformpage(ganho: ganhos[index])));
                              if (result != null && result is Ganho) {
+                              ganhoRepository.editGanho(result);
                              setState(() {
-                            ganhos[index] = result;
+                            ganhos = ganhoRepository.getGanhos();
                       });
                        }
                        },
@@ -108,8 +112,7 @@ void deleteGanhos(int index){
                           
                           ],
                         ),
-                      
-                    
+
                       ],
                     ),
                   );
@@ -122,8 +125,9 @@ void deleteGanhos(int index){
   onPressed: () async {
     final result = await Navigator.pushNamed(context, '/add');
     if (result != null && result is Ganho) {
+        ganhoRepository.addGanho(result);
       setState(() {
-        ganhos.add(result);
+        ganhos = ganhoRepository.getGanhos();
       });
     }
   },
