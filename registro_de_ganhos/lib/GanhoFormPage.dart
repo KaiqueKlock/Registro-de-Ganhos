@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
-import 'package:registro_de_ganhos/Utils/input_formater.dart';
 import 'package:registro_de_ganhos/Utils/validator.dart';
 import 'package:registro_de_ganhos/Widgets/user_inputs.dart';
 import 'package:uuid/uuid.dart';
@@ -43,7 +42,6 @@ void initState() {
   Widget build(BuildContext context) {
 
 
-    
 
     void validate(context) {
       
