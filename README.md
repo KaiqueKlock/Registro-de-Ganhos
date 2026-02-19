@@ -1,50 +1,16 @@
-# 💰 Registro de Ganhos
-Aplicativo Flutter para registro e gerenciamento de ganhos financeiros.
+# registro_de_ganhos
 
-## 📱 Sobre o Projeto
-O Registro de Ganhos é um aplicativo desenvolvido em Flutter com o objetivo de permitir que o usuário registre, visualize, edite e remova ganhos financeiros de forma simples e organizada.
-O projeto foi criado com foco em aprendizado de arquitetura, boas práticas e evolução progressiva da aplicação.
+A new Flutter project.
 
-## 🚀 Funcionalidades Atuais
-- ✅ Adicionar novo ganho
-- ✅ Editar ganho existente
-- ✅ Remover ganho
-- ✅ Identificação única por ID (UUID)
-- ✅ Navegação entre telas com passagem de dados
-- ✅ Estrutura baseada em Repository
-- ✅ Separação entre UI e lógica de dados
+## Getting Started
 
-## 🏗️ Arquitetura
-O projeto utiliza:
+This project is a starting point for a Flutter application.
 
-- **Model** para representação da entidade `Ganho`
-- **Repository Pattern** para gerenciamento da lista
-- **Navegação com MaterialPageRoute**
-- Identificação por **UUID** ao invés de índice
-- Atualização segura de objetos utilizando ID
+A few resources to get you started if this is your first Flutter project:
 
-O foco atual está em manter o código organizado e preparado para futuras melhorias como gerenciamento de estado e persistência de dados.
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-## 🔮 Próximos Passos
-- 🔹 Implementação de validação de inputs
-- 🔹 Introdução de gerenciamento de estado (Provider)
-- 🔹 Persistência de dados (local storage ou banco)
-- 🔹 Melhorias visuais na interface
-- 🔹 Organização de pastas seguindo arquitetura escalável
-
-## 🛠️ Tecnologias Utilizadas
-- Flutter
-- Dart
-- UUID package
-
-## 📌 Objetivo do Projeto
-Este projeto faz parte do meu processo de aprendizado em Flutter, com foco em:
-
-- Arquitetura limpa
-- Boas práticas
-- Imutabilidade
-- Separação de responsabilidades
-- Escalabilidade de código
-
-## 📷 Em breve
-Screenshots e melhorias visuais serão adicionados conforme o projeto evolui.
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

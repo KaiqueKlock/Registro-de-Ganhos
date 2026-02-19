@@ -10,7 +10,7 @@ class Validator {
               final parsedValue = double.parse(digits) / 100;
          
 
-              if ('.'.allMatches(cleanedValue).length > 2) {
+              if ('.'.allMatches(cleanedValue).length > 3) {
               return 'Número inválido';
               }
               if (parsedValue <= 0) {
