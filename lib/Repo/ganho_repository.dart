@@ -1,25 +1,23 @@
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 
 class GanhoRepository {
-final List<Ganho> _ganhos = [];
+final Box<Ganho> box = Hive.box<Ganho>('ganhos');
 
 void addGanho(Ganho ganho) {
-  _ganhos.add(ganho);
+  box.add(ganho);
   }
 
 void removeGanho(Ganho ganho) {
-  _ganhos.remove(ganho);
-  
+  ganho.delete();
   }
 
-void editGanho(Ganho newGanho) {
-  final index =_ganhos.indexWhere((g) => g.id == newGanho.id);
-  if (index >= 0 && index < _ganhos.length) {
-    _ganhos[index] = newGanho;
+ void editGanho(Ganho ganho, double novoValor) {
+    ganho.value = novoValor;
+    ganho.save();
   }
-}
 List<Ganho> getGanhos(){
-  return List.unmodifiable(_ganhos);
+  return List.unmodifiable(box.values);
   }
 
 }

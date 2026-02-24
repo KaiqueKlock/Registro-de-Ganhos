@@ -1,10 +1,18 @@
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
+import 'package:hive/hive.dart';
+part 'ganho.g.dart';
 
-class Ganho {
-final DateTime data;
-final double value;
-final String description;
-final String id;
+@HiveType(typeId: 0)
+class Ganho extends HiveObject{
+
+@HiveField(0)
+DateTime data;
+@HiveField(1)
+double value;
+@HiveField(2)
+String description;
+@HiveField(3)
+String id;
 
 Ganho({required this.value, required this.description, required this.data, required this.id});
 

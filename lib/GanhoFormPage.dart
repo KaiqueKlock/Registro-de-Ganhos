@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 import 'package:registro_de_ganhos/Utils/validator.dart';
 import 'package:registro_de_ganhos/Widgets/user_inputs.dart';
 import 'package:uuid/uuid.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 
@@ -23,11 +25,11 @@ class _AddPageState extends State<Ganhoformpage> {
   late TextEditingController descriptionController = TextEditingController();
 
     final formKey = GlobalKey<FormState>();
-
+  late Ganho? ganho;
   @override
 void initState() {
   super.initState();
-
+ganho = widget.ganho;
   doublecontroller = TextEditingController(
     text: widget.ganho?.value.toString() ?? '',
   );
@@ -46,23 +48,23 @@ void initState() {
     void validate(context) {
       
           if (formKey.currentState!.validate()) {
-       final digits = doublecontroller.text.replaceAll(RegExp(r'[^0-9]'), '');
+        final digits = doublecontroller.text.replaceAll(RegExp(r'[^0-9]'), '');
         final parsedValue = double.parse(digits) / 100;
 
-        final ganho = widget.ganho == null
-            ? Ganho(
+        if(widget.ganho == null){
+             final novoGanho = Ganho(
                 id: widget.uuid.v4(),
                 value: parsedValue,
                 description: descriptionController.text,
                 data: DateTime.now(),
-              )
-            : Ganho(
-                id: widget.ganho!.id,
-                value: parsedValue,
-                description: descriptionController.text,
-                data: widget.ganho!.data,
-              );
-
+              ); 
+             Hive.box<Ganho>('ganhos').add(novoGanho); 
+            } else{ widget.ganho!
+              ..value = parsedValue
+              ..description = descriptionController.text
+              ..data = DateTime.now();
+              widget.ganho!.save();
+              }
         Navigator.pop(context, ganho);
       }
     }
@@ -77,9 +79,13 @@ void initState() {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-              Inputs(labelText:'Descrição', date: DateTime.now(), controller: descriptionController, keyboardType: TextInputType.text), // campo para add descrição
+              Inputs(labelText:'Descrição', date: DateTime.now(), controller: descriptionController, keyboardType: TextInputType.text, validator: (value){
+                if(value!.length > 12){
+                  return 'A descrição deve conter no máximo 12 caracteres.';
+                }
+              }), // campo para add descrição
               SizedBox(height: 20,),
-              Inputs(labelText:'Valor', hintText: 'R\$ 0.0', value: 40.0, date: DateTime.now(), controller: doublecontroller, inputFormatter: CurrencyFormatter(), keyboardType: TextInputType.number, validator: Validator.validateValue ), // campo para add valor
+              Inputs(labelText:'Valor', hintText: 'R\$ 0.0', date: DateTime.now(), controller: doublecontroller, inputFormatter: CurrencyFormatter(), keyboardType: TextInputType.number, validator: Validator.validateValue ), // campo para add valor
               IconButton(
                 icon: Icon(Icons.save_outlined, size: 50),
              onPressed: () => validate(context),
