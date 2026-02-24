@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:registro_de_ganhos/GanhoFormPage.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
-import 'package:registro_de_ganhos/Repo/ganho_repository.dart';
 import 'package:registro_de_ganhos/Utils/GanhoService.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
-import 'package:registro_de_ganhos/Widgets/user_inputs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {

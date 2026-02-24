@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 import 'package:registro_de_ganhos/Utils/validator.dart';
@@ -25,18 +26,28 @@ class _AddPageState extends State<Ganhoformpage> {
   late TextEditingController descriptionController = TextEditingController();
 
     final formKey = GlobalKey<FormState>();
-  late Ganho? ganho;
-  @override
+  
+@override
 void initState() {
   super.initState();
-ganho = widget.ganho;
-  doublecontroller = TextEditingController(
-    text: widget.ganho?.value.toString() ?? '',
+
+  final format = NumberFormat.currency(
+    locale: 'pt_BR',
+    symbol: 'R\$',
   );
 
-  descriptionController = TextEditingController(
-    text: widget.ganho?.description ?? '',
-  );
+  if (widget.ganho != null) {
+    doublecontroller = TextEditingController(
+      text: format.format(widget.ganho!.value),
+    );
+
+    descriptionController = TextEditingController(
+      text: widget.ganho!.description,
+    );
+  } else {
+    doublecontroller = TextEditingController();
+    descriptionController = TextEditingController();
+  }
 }
 
 
@@ -48,8 +59,13 @@ ganho = widget.ganho;
     void validate(context) {
       
           if (formKey.currentState!.validate()) {
-        final digits = doublecontroller.text.replaceAll(RegExp(r'[^0-9]'), '');
-        final parsedValue = double.parse(digits) / 100;
+        final format = NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: 'R\$',
+    );
+
+    final parsedValue =
+        format.parse(doublecontroller.text).toDouble();
 
         if(widget.ganho == null){
              final novoGanho = Ganho(
@@ -65,7 +81,7 @@ ganho = widget.ganho;
               ..data = DateTime.now();
               widget.ganho!.save();
               }
-        Navigator.pop(context, ganho);
+        Navigator.pop(context);
       }
     }
 
