@@ -32,11 +32,12 @@ Widget build(BuildContext context) {
       hintText: hintText,
       labelText: labelText,
       labelStyle: TextStyle(
-        color: Colors.black,
+      
       ),
       border: OutlineInputBorder(),
     ),
   );
 }
 }
+
 

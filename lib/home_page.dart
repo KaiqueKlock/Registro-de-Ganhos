@@ -7,7 +7,9 @@ import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title}); 
+  final VoidCallback toggleTheme;
+  final Function(Color) changeColor;
+  const MyHomePage({super.key, required this.title, required this.toggleTheme, required this.changeColor}); 
   final String title;
   
   @override
@@ -16,6 +18,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+Widget _colorTile(Color color) { //helper para cores tiles
+  return ListTile(
+    leading: CircleAvatar(backgroundColor: color),
+    onTap: () {
+      widget.changeColor(color);
+      Navigator.pop(context);
+    },
+  );
+}
 
 
   @override
@@ -23,6 +34,31 @@ class _MyHomePageState extends State<MyHomePage> {
   
     return Scaffold(
       appBar: AppBar(
+        actions: [
+  IconButton(
+    icon: Icon(Icons.dark_mode),
+    onPressed: widget.toggleTheme,
+  ),
+  IconButton(
+    icon: Icon(Icons.palette),
+    onPressed: () {
+      showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return Wrap(
+            children: [
+              _colorTile(Colors.green),
+              _colorTile(Colors.blue),
+              _colorTile(Colors.purple),
+              _colorTile(Colors.orange),
+              _colorTile( Color.fromARGB(255, 243, 22, 7)),
+            ],
+          );
+        },
+      );
+    },
+  ),
+],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
@@ -51,8 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   Expanded(
                     child: ListTile(
-                      title: Text(CurrencyFormatter.format(totalMes), style: TextStyle(fontSize: 24, color: const Color.fromARGB(255, 3, 3, 3)), textAlign: TextAlign.center,),
-                      subtitle: Text('Este Mês', style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 3, 3, 3)), textAlign: TextAlign.center,),
+                      title: Text(CurrencyFormatter.format(totalMes), style: TextStyle(fontSize: 24), textAlign: TextAlign.center,),
+                      subtitle: Text('Este Mês', style: TextStyle(fontSize: 16), textAlign: TextAlign.center,),
                     ),
                   ),
                 ],),
@@ -62,8 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Card(child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: Text(CurrencyFormatter.format(totalDia), style: TextStyle(fontSize: 24, color: const Color.fromARGB(255, 3, 3, 3)),),
-                      subtitle: Text('Hoje', style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 3, 3, 3)),)),
+                      title: Text(CurrencyFormatter.format(totalDia), style: TextStyle(fontSize: 24),),
+                      subtitle: Text('Hoje', style: TextStyle(fontSize: 16),)),
                   )),
                 ),
 
@@ -71,8 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Card(child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: Text(CurrencyFormatter.format(totalSemana), style: TextStyle(fontSize: 24, color: const Color.fromARGB(255, 3, 3, 3)),),
-                      subtitle:Text('Esta Semana', style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 3, 3, 3)),),
+                      title: Text(CurrencyFormatter.format(totalSemana), style: TextStyle(fontSize: 24),),
+                      subtitle:Text('Esta Semana', style: TextStyle(fontSize: 16),),
                       ),
                                     )),
                   ),
@@ -98,14 +134,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             Column(
                                 children: [
                                 SizedBox(height: 20),
-                               Text(ganho.description, style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 3, 3, 3)),),
+                               Text(ganho.description, style: TextStyle(fontSize: 20),),
                                 SizedBox(height: 10),
-                                Text(ganho.formatedDate, style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 3, 3, 3)),),
+                                Text(ganho.formatedDate, style: TextStyle(fontSize: 14),),
                                 SizedBox(height: 20),
                               ],
                             ),
                         
-                            Text(ganho.formatedValue, style: TextStyle(fontSize: 20, color: const Color.fromARGB(255, 3, 3, 3), fontWeight: FontWeight.bold),),
+                            Text(ganho.formatedValue, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                              
                             Row(
                               children: [
