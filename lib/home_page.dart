@@ -46,6 +46,7 @@ Widget _colorTile(Color color) { //helper para cores tiles
         context: context,
         builder: (_) {
           return Wrap(
+            
             children: [
               _colorTile(Colors.green),
               _colorTile(Colors.blue),
@@ -151,7 +152,8 @@ Widget _colorTile(Color color) { //helper para cores tiles
                               IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () async {
-                            await Navigator.push(context, MaterialPageRoute(builder: (_) => Ganhoformpage(ganho: ganho,)));
+                              await showModalBottomSheet(context: context, builder:(_) => Ganhoformpage(ganho: ganho));
+                             // await Navigator.push(context, MaterialPageRoute(builder: (_) => Ganhoformpage(ganho: ganho,)));
                        },
                                                         ),
                               ],
@@ -173,7 +175,13 @@ Widget _colorTile(Color color) { //helper para cores tiles
         floatingActionButton: FloatingActionButton(
          
   onPressed: () async {
-    await Navigator.pushNamed(context, '/add');
+    showModalBottomSheet(
+        context: context,
+        builder: (_) {
+        return Ganhoformpage();
+
+        });
+
    },
   tooltip: 'Adicionar Ganho',
   child: Icon(Icons.add),
