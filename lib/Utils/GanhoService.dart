@@ -23,12 +23,26 @@ class GanhoService {
 
     return calculateGanho(ganhos, inicio, fim);
 }
+   static double calculateGanhoPorMes(
+  List<Ganho> ganhos,
+  int year,
+  int month,
+) {
+  final inicio = DateTime(year, month, 1);
+  final fim = DateTime(year, month + 1, 1);
 
+  return calculateGanho(ganhos, inicio, fim);
+}
     static double calculateGanhoMensal(List<Ganho> ganhos) {
     final now = DateTime.now();
-    final inicio = DateTime(now.year, now.month, 1);
-    final fim = DateTime(now.year, now.month + 1, 1);
     
-    return calculateGanho(ganhos, inicio, fim);
+
+    return calculateGanhoPorMes(ganhos, now.year, now.month);
 }
+
+static double calculateCrescimento(double atual, double anterior) {
+  if (anterior == 0) return 0;
+  return ((atual - anterior) / anterior) * 100;
+}
+
 }

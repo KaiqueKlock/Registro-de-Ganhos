@@ -26,6 +26,24 @@ class CurrencyFormatter extends TextInputFormatter {
     
     }   
 
+    static double parseCurrency(String value) {
+  return double.parse(
+    value
+      .replaceAll("R\$", "")
+      .replaceAll(".", "")
+      .replaceAll(",", ".")
+      .trim(),
+  );
+}
+
+static String formatCurrency(double value) {
+  final format = NumberFormat.currency(
+    locale: 'pt_BR',
+    symbol: 'R\$ ',
+  );
+  return format.format(value);
+}
+
    static String format(double value) {
     return _formatter.format(value);
   }

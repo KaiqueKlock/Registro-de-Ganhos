@@ -14,6 +14,8 @@ String description;
 @HiveField(3)
 String id;
 
+
+
 Ganho({required this.value, required this.description, required this.data, required this.id});
 
 int get integerValue => value.round();

@@ -84,9 +84,7 @@ void initState() {
         Navigator.pop(context);
       }
     }
-
-
-
+    
     return Scaffold(
       body: ListView(
             children: [
