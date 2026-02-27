@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 import 'package:hive/hive.dart';
 part 'ganho.g.dart';
@@ -21,7 +22,7 @@ Ganho({required this.value, required this.description, required this.data, requi
 int get integerValue => value.round();
 String get formatedValue =>  CurrencyFormatter.format(value);
 
-String get formatedDate => '${data.day}/${data.month}/${data.year}';
+String get formatedDate => DateFormat('dd/MM', 'pt_BR').format(data); // verificar como ficou
 
 bool get isNow{
   final now = DateTime.now();

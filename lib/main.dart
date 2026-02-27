@@ -3,9 +3,11 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:registro_de_ganhos/GanhoFormPage.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/home_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();
+    await initializeDateFormatting('pt_BR', null);
     await Hive.initFlutter();
     Hive.registerAdapter(GanhoAdapter());
     await Hive.openBox<Ganho>('ganhos');

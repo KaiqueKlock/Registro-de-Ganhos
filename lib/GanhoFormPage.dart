@@ -85,31 +85,25 @@ void initState() {
       }
     }
     
-    return Scaffold(
-      body: ListView(
-            children: [
-            Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-              Inputs(labelText:'Descrição', date: DateTime.now(), controller: descriptionController, keyboardType: TextInputType.text, validator: (value){
-                if(value!.length > 12){
-                  return 'A descrição deve conter no máximo 12 caracteres.';
-                }
-              }), // campo para add descrição
-              SizedBox(height: 20,),
-              Inputs(labelText:'Valor', hintText: 'R\$ 0.0', date: DateTime.now(), controller: doublecontroller, inputFormatter: CurrencyFormatter(), keyboardType: TextInputType.number, validator: Validator.validateValue ), // campo para add valor
-              IconButton(
-                icon: Icon(Icons.save_outlined, size: 50),
+    return Form(
+      key: formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+      Inputs(labelText:'Descrição', date: DateTime.now(), controller: descriptionController, keyboardType: TextInputType.text, validator: (value){
+        if(value!.length > 12){
+          return 'A descrição deve conter no máximo 12 caracteres.';
+        }
+      }), // campo para add descrição
+      SizedBox(height: 20,),
+      Inputs(labelText:'Valor', hintText: 'R\$ 0.0', date: DateTime.now(), controller: doublecontroller, inputFormatter: CurrencyFormatter(), keyboardType: TextInputType.number, validator: Validator.validateValue ), // campo para add valor
+      IconButton(
+        icon: Icon(Icons.save_outlined, size: 50),
              onPressed: () => validate(context),
-
-              ),
-                ],
-              ),
-            )
             
-            ],
+      ),
+        ],
       ),
     );
   }

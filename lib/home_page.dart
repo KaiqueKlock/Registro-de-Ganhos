@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:registro_de_ganhos/GanhoFormPage.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/GanhoService.dart';
@@ -49,7 +50,7 @@ final TextEditingController _metaController =
           controller: _metaController,
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(
-            hintText: "R\$ 00,00",
+            hintText: "R\$ 0,0",
           ),
         ),
         actions: [
@@ -104,21 +105,27 @@ Widget _colorTile(Color color) { //helper para cores tiles
   IconButton(
     icon: Icon(Icons.palette),
     onPressed: () {
-      showDialog( //verificar se ficou melhor do que showModal
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            
-            actions: [
-              _colorTile(Colors.green),
-              _colorTile(Colors.blue),
-              _colorTile(Colors.purple),
-              _colorTile(Colors.orange),
-              _colorTile( Color.fromARGB(255, 243, 22, 7)),
-            ],
-          );
-        },
-      );
+      showDialog(
+  context: context,
+  builder: (_) {
+    return AlertDialog(
+      title: const Text("Escolha uma cor"),
+      content: Wrap(
+  spacing: 10,
+  runSpacing: 10,
+  children: [
+      _colorTile(const Color.fromARGB(255, 69, 4, 80)),
+      _colorTile(const Color.fromARGB(255, 219, 16, 1)),
+      _colorTile(const Color.fromARGB(242, 238, 10, 151)),
+      _colorTile(const Color.fromARGB(255, 233, 189, 123)),
+      _colorTile(const Color.fromARGB(255, 78, 224, 83)),
+      _colorTile(const Color.fromARGB(255, 43, 142, 255)),
+      _colorTile(const Color.fromARGB(255, 18, 238, 227)),
+  ],
+),
+    );
+  },
+);
     },
   ),
 ],
@@ -137,7 +144,8 @@ Widget _colorTile(Color color) { //helper para cores tiles
 
         final ganhos = ganhosBox.values.toList();
         final now = DateTime.now();
-
+        final mes = DateFormat('MMMM', 'pt_BR').format(now);
+        final mesCapital = mes[0].toUpperCase() + mes.substring(1); 
         final key = Goalutils.goalKey(now);
         final meta = settingsBox.get(key);
 
@@ -170,6 +178,9 @@ Widget _colorTile(Color color) { //helper para cores tiles
               totalAnterior,
             );
            
+        final crescimentoTotal = totalMes - totalAnterior;
+
+
         return Column(
           children: [
             SizedBox(height: 20),
@@ -188,7 +199,7 @@ Widget _colorTile(Color color) { //helper para cores tiles
                             textAlign: TextAlign.center,
                           ),
                           subtitle: Text(
-                            now.month.toRadixString(2), //verificar como ficou "Este Mes"
+                            mesCapital,
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -200,17 +211,38 @@ Widget _colorTile(Color color) { //helper para cores tiles
                     children: [
                       Expanded(
                         child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ListTile(
-                              title: Text(
-                                "${crescimentoMensal.toStringAsFixed(1)}%",
-                                style: TextStyle(fontSize: 24),
-                              ),
-                              subtitle: Text('Valorização'),
-                            ),
-                          ),
-                        ),
+  elevation: 4,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(10),
+  ),
+  child: Padding(
+    padding: EdgeInsets.all(16),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Valorização", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold) ,),
+        SizedBox(height: 4),
+        totalAnterior != 0 && crescimentoMensal != 0 
+        ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "R\$ ${CurrencyFormatter.formatCurrency(crescimentoTotal)}",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text("$crescimentoMensal%"),
+          ],
+        ) : Text('Primeiro Mês', style: TextStyle(fontSize: 16),),
+         
+        
+      ],
+    ),
+  ),
+)
                       ),
 
                       Expanded(
@@ -242,9 +274,10 @@ Widget _colorTile(Color color) { //helper para cores tiles
                     margin: EdgeInsets.symmetric(horizontal: 8.0),
                     child: Row(
                       mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                          MainAxisAlignment.spaceAround,
                       children: [
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(height: 20),
                             Text(ganho.description),
@@ -266,15 +299,13 @@ Widget _colorTile(Color color) { //helper para cores tiles
                             IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () async {
-                                await showDialog(
-                                  context: context,
-                                  builder: (_) =>
-                                      Ganhoformpage(
-                                        ganho: ganho,
-                                      ),
-                                );
-                              },
-                            ),
+                        showDialog(
+                            context: context,
+                            builder: (_) {
+                            return AlertDialog(content: Ganhoformpage(ganho: ganho,),);
+                            });
+                           },
+                             ),
                                                         IconButton(
                               icon: Icon(Icons.delete),
                               onPressed: () =>

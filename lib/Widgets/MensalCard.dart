@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 
 class MetaMensalCard extends StatelessWidget {
   final double totalAtual;
@@ -20,7 +21,7 @@ class MetaMensalCard extends StatelessWidget {
       return Card(
         child: ListTile(
           title: const Text("Meta"),
-          subtitle: const Text("Você ainda não tem uma meta", style: TextStyle(fontSize: 8),),
+          subtitle: const Text("Você ainda não definiu uma meta", style: TextStyle(fontSize: 10),),
           trailing: TextButton(
             onPressed: onDefinirMeta,
             child: const Text("Definir"),
@@ -31,18 +32,18 @@ class MetaMensalCard extends StatelessWidget {
     
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 const Text(
                   "Meta",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 20,
                   ),
                 ),
                 Row(
@@ -59,10 +60,10 @@ class MetaMensalCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
-              "R\$ ${totalAtual.toStringAsFixed(2)} / "
-              "R\$ ${meta!.toStringAsFixed(2)}", style: TextStyle(fontSize: 12),
+              "${CurrencyFormatter.formatCurrency(totalAtual)} / "
+              "${CurrencyFormatter.formatCurrency(meta!)}", style: TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
