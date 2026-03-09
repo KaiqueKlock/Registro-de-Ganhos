@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
+
+final now = DateTime.now();
 
 class GanhoService {
       static double calculateGanho(List<Ganho> ganhos, DateTime inicio, DateTime fim) {
@@ -8,7 +11,7 @@ class GanhoService {
       }
 
     static double calculateGanhoDiario(List<Ganho> ganhos) {
-    final now = DateTime.now();
+    
     final inicio = DateTime(now.year, now.month, now.day);
     final fim = inicio.add(const Duration(days: 1));
     
@@ -16,7 +19,7 @@ class GanhoService {
 }
 
     static double calculateGanhoSemanal(List<Ganho> ganhos) {
-    final now = DateTime.now();
+  
     final iniciodaSemana = now.subtract(Duration(days: now.weekday - 1)); // Início da semana (segunda-feira)
     final inicio = DateTime(iniciodaSemana.year, iniciodaSemana.month, iniciodaSemana.day);
     final fim = inicio.add(const Duration(days: 7)); // Fim da semana (domingo)
@@ -34,7 +37,7 @@ class GanhoService {
   return calculateGanho(ganhos, inicio, fim);
 }
     static double calculateGanhoMensal(List<Ganho> ganhos) {
-    final now = DateTime.now();
+  
     
 
     return calculateGanhoPorMes(ganhos, now.year, now.month);
@@ -42,7 +45,11 @@ class GanhoService {
 
 static double calculateCrescimento(double atual, double anterior) {
   if (anterior == 0) return 0;
-  return ((atual - anterior) / anterior) * 100;
+
+  double percentualMesPassado = DateTime.now().day / DateUtils.getDaysInMonth(now.year, now.month);
+  double metaAjustada = anterior * percentualMesPassado;
+
+  return ((atual - metaAjustada) / metaAjustada) * 100;
 }
 
 }

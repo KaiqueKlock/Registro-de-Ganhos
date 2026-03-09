@@ -6,6 +6,10 @@ class MetaMensalCard extends StatelessWidget {
   final double? meta;
   final VoidCallback onDefinirMeta;
   final VoidCallback onRemoverMeta;
+  final double percentualMeta;
+  final double percentualCrescimento;
+  final String mesAtual;
+  final bool temMesAnterior;
 
   const MetaMensalCard({
     super.key,
@@ -13,6 +17,10 @@ class MetaMensalCard extends StatelessWidget {
     required this.meta,
     required this.onDefinirMeta,
     required this.onRemoverMeta,
+    required this.percentualMeta,
+    required this.percentualCrescimento,
+    required this.mesAtual,
+    required this.temMesAnterior,
   });
 
   @override
@@ -20,31 +28,44 @@ class MetaMensalCard extends StatelessWidget {
     if (meta == null) {
       return Card(
         child: ListTile(
-          title: const Text("Meta"),
-          subtitle: const Text("Você ainda não definiu uma meta", style: TextStyle(fontSize: 10),),
+          title: const Text('Meta'),
+          subtitle: const Text(
+            'Voce ainda nao definiu uma meta',
+            style: TextStyle(fontSize: 10),
+          ),
           trailing: TextButton(
             onPressed: onDefinirMeta,
-            child: const Text("Definir"),
+            child: const Text('Definir'),
           ),
         ),
       );
     }
-    
+
+    final bool exibeComparacao = totalAtual > 0 && temMesAnterior;
+    final String crescimentoTexto;
+    if (totalAtual == 0) {
+      crescimentoTexto = 'Sem registros';
+    } else if (!temMesAnterior) {
+      crescimentoTexto = 'Primeiro mes';
+    } else {
+      crescimentoTexto = '${percentualCrescimento.toStringAsFixed(1)}%';
+    }
+
     return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Meta",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
+                  'Meta',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 Row(
                   children: [
@@ -62,13 +83,36 @@ class MetaMensalCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              "${CurrencyFormatter.formatCurrency(totalAtual)} / "
-              "${CurrencyFormatter.formatCurrency(meta!)}", style: TextStyle(fontSize: 12),
+              '${CurrencyFormatter.formatCurrency(totalAtual)} / '
+              '${CurrencyFormatter.formatCurrency(meta!)}',
+              style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: (totalAtual / meta!).clamp(0, 1),
-            ),
+            LinearProgressIndicator(value: (totalAtual / meta!).clamp(0, 1)),
+            const SizedBox(height: 8),
+            if (exibeComparacao)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    crescimentoTexto,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text('vs mes anterior', style: TextStyle(fontSize: 11)),
+                ],
+              )
+            else
+              Text(
+                crescimentoTexto,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
           ],
         ),
       ),
