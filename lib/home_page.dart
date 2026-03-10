@@ -6,7 +6,6 @@ import 'package:registro_de_ganhos/GanhoFormPage.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/GanhoService.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:registro_de_ganhos/Utils/goalUtils.dart';
 import 'package:registro_de_ganhos/Widgets/MensalCard.dart';
 
@@ -75,10 +74,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _colorTile(Color color) {
-    //helper para cores tiles
+  Widget _colorTile(Color color, String label) {
     return ListTile(
       leading: CircleAvatar(backgroundColor: color),
+      title: Text(label),
       onTap: () {
         widget.changeColor(color);
         Navigator.pop(context);
@@ -89,39 +88,42 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.dark_mode),
-            onPressed: widget.toggleTheme,
-          ),
-          IconButton(
-            icon: Icon(Icons.palette),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) {
-                  return AlertDialog(
-                    title: const Text("Escolha uma cor"),
-                    content: Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        _colorTile(const Color.fromARGB(255, 69, 4, 80)),
-                        _colorTile(const Color.fromARGB(255, 219, 16, 1)),
-                        _colorTile(const Color.fromARGB(242, 238, 10, 151)),
-                        _colorTile(const Color.fromARGB(255, 233, 189, 123)),
-                        _colorTile(const Color.fromARGB(255, 78, 224, 83)),
-                        _colorTile(const Color.fromARGB(255, 43, 142, 255)),
-                        _colorTile(const Color.fromARGB(255, 18, 238, 227)),
-                      ],
-                    ),
-                  );
+      drawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            children: [
+              const ListTile(title: Text('Configuracoes')),
+              ListTile(
+                leading: const Icon(Icons.dark_mode),
+                title: const Text('Alternar tema'),
+                onTap: () {
+                  widget.toggleTheme();
+                  Navigator.pop(context);
                 },
-              );
-            },
+              ),
+              const Divider(),
+              ExpansionTile(
+                leading: const Icon(Icons.palette),
+                title: const Text('Cor do app'),
+                children: [
+                  _colorTile(const Color.fromARGB(255, 69, 4, 80), 'Roxo'),
+                  _colorTile(const Color.fromARGB(255, 219, 16, 1), 'Vermelho'),
+                  _colorTile(const Color.fromARGB(242, 238, 10, 151), 'Pink'),
+                  _colorTile(
+                    const Color.fromARGB(255, 233, 189, 123),
+                    'Laranja',
+                  ),
+                  _colorTile(const Color.fromARGB(255, 78, 224, 83), 'Verde'),
+                  _colorTile(const Color.fromARGB(255, 43, 142, 255), 'Azul'),
+                  _colorTile(const Color.fromARGB(255, 18, 238, 227), 'Ciano'),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+      appBar: AppBar(
+        centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
@@ -166,43 +168,35 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   SizedBox(height: 5),
 
-                  Card.outlined(
-                    margin: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ListTile(
-                                title: Text(
-                                  CurrencyFormatter.format(totalMes),
-                                  style: TextStyle(fontSize: 24),
-                                  textAlign: TextAlign.center,
-                                ),
-                                subtitle: Text(
-                                  mesCapital,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ],
+                  if (meta == null)
+                    Card.outlined(
+                      margin: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ListTile(
+                        title: Text(
+                          CurrencyFormatter.format(totalMes),
+                          style: TextStyle(fontSize: 24),
+                          textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 10),
-                        MetaMensalCard(
-                          percentualMeta: percentualMeta,
-                          percentualCrescimento: crescimentoMensal,
-                          totalAtual: totalMes,
-                          mesAtual: mesCapital,
-                          temMesAnterior: totalAnterior > 0,
-                          meta: meta,
-                          onDefinirMeta: abrirDialogMeta,
-                          onRemoverMeta: () {
-                            settingsBox.delete(key);
-                          },
+                        subtitle: Text(mesCapital, textAlign: TextAlign.center),
+                        trailing: TextButton(
+                          onPressed: abrirDialogMeta,
+                          child: const Text('Definir meta'),
                         ),
-                      ],
+                      ),
+                    )
+                  else
+                    MetaMensalCard(
+                      percentualMeta: percentualMeta,
+                      percentualCrescimento: crescimentoMensal,
+                      totalAtual: totalMes,
+                      mesAtual: mesCapital,
+                      temMesAnterior: totalAnterior > 0,
+                      meta: meta,
+                      onDefinirMeta: abrirDialogMeta,
+                      onRemoverMeta: () {
+                        settingsBox.delete(key);
+                      },
                     ),
-                  ),
 
                   SizedBox(height: 10),
 

@@ -5,16 +5,15 @@ import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/home_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-void main() async{
-    WidgetsFlutterBinding.ensureInitialized();
-    await initializeDateFormatting('pt_BR', null);
-    await Hive.initFlutter();
-    Hive.registerAdapter(GanhoAdapter());
-    await Hive.openBox<Ganho>('ganhos');
-    await Hive.openBox('settings');
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('pt_BR', null);
+  await Hive.initFlutter();
+  Hive.registerAdapter(GanhoAdapter());
+  await Hive.openBox<Ganho>('ganhos');
+  await Hive.openBox('settings');
 
-
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -29,23 +28,22 @@ class _MyAppState extends State<MyApp> {
   late ThemeMode _themeMode;
   late Color _color;
 
-void toggleTheme() {
-  setState(() {
-    _themeMode =
-        _themeMode == ThemeMode.light
-            ? ThemeMode.dark
-            : ThemeMode.light;
+  void toggleTheme() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.light
+          ? ThemeMode.dark
+          : ThemeMode.light;
 
-    settingsBox.put('themeMode', _themeMode.index);
-  });
-}
+      settingsBox.put('themeMode', _themeMode.index);
+    });
+  }
 
-void changeColor(Color newColor) {
-  setState(() {
-    _color = newColor;
-    settingsBox.put('seedColor', newColor.value);
-  });
-}
+  void changeColor(Color newColor) {
+    setState(() {
+      _color = newColor;
+      settingsBox.put('seedColor', newColor.value);
+    });
+  }
 
   @override
   void initState() {
@@ -72,34 +70,35 @@ void changeColor(Color newColor) {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-return MaterialApp(
-  debugShowCheckedModeBanner: false,
-  themeMode: _themeMode,
-  theme: ThemeData(
-    
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: _color,
-      brightness: Brightness.light,
-    ),
-  ),
-  darkTheme: ThemeData(
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: _color,
-      brightness: Brightness.dark,
-    ),
-  ),
-  home: MyHomePage(
-    title: 'Registro de Ganhos',
-    toggleTheme: toggleTheme,
-    changeColor: changeColor,
-  ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      themeMode: _themeMode,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _color,
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _color,
+          brightness: Brightness.dark,
+        ),
+      ),
+      home: MyHomePage(
+        title: 'Controle de Ganhos',
+        toggleTheme: toggleTheme,
+        changeColor: changeColor,
+      ),
 
       routes: {
-        '/add' : (context) => Ganhoformpage(),
-        '/home' : (context) => MyHomePage(title: 'Registro de Ganhos', toggleTheme: toggleTheme, changeColor: changeColor,),},
+        '/add': (context) => Ganhoformpage(),
+        '/home': (context) => MyHomePage(
+          title: 'Controle de Ganhos',
+          toggleTheme: toggleTheme,
+          changeColor: changeColor,
+        ),
+      },
     );
-    
   }
 }
-
- 
