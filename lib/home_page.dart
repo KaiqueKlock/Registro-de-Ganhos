@@ -87,15 +87,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       drawer: Drawer(
         child: SafeArea(
           child: ListView(
             children: [
-              const ListTile(title: Text('Configuracoes')),
+              const ListTile(title: Text('Configurações')),
               ListTile(
-                leading: const Icon(Icons.dark_mode),
-                title: const Text('Alternar tema'),
+                leading: Icon(isDarkTheme ? Icons.light_mode : Icons.dark_mode),
                 onTap: () {
                   widget.toggleTheme();
                   Navigator.pop(context);
@@ -104,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const Divider(),
               ExpansionTile(
                 leading: const Icon(Icons.palette),
-                title: const Text('Cor do app'),
+                title: const Text('Seleção de Cor'),
                 children: [
                   _colorTile(const Color.fromARGB(255, 69, 4, 80), 'Roxo'),
                   _colorTile(const Color.fromARGB(255, 219, 16, 1), 'Vermelho'),
@@ -138,6 +139,24 @@ class _MyHomePageState extends State<MyHomePage> {
               final now = DateTime.now();
               final mes = DateFormat('MMMM', 'pt_BR').format(now);
               final mesCapital = mes[0].toUpperCase() + mes.substring(1);
+              final mesAnteriorData = DateTime(now.year, now.month - 1);
+              final mesAnteriorNome = DateFormat(
+                'MMMM',
+                'pt_BR',
+              ).format(mesAnteriorData);
+              final mesAnteriorCapital =
+                  mesAnteriorNome[0].toUpperCase() +
+                  mesAnteriorNome.substring(1);
+              final diaMaxMesAnterior = DateUtils.getDaysInMonth(
+                mesAnteriorData.year,
+                mesAnteriorData.month,
+              );
+              final diaReferencia = now.day > diaMaxMesAnterior
+                  ? diaMaxMesAnterior
+                  : now.day;
+              
+              final referenciaMesAnterior =
+                  '${diaReferencia.toString().padLeft(2, '0')}/$mesAnteriorCapital';
               final key = Goalutils.goalKey(now);
               final meta = settingsBox.get(key);
 
@@ -147,12 +166,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 now.month,
               );
 
-              final mesAnterior = DateTime(now.year, now.month - 1);
-
               final totalAnterior = GanhoService.calculateGanhoPorMes(
                 ganhos,
-                mesAnterior.year,
-                mesAnterior.month,
+                mesAnteriorData.year,
+                mesAnteriorData.month,
               );
 
               final crescimentoMensal = GanhoService.calculateCrescimento(
@@ -190,6 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       percentualCrescimento: crescimentoMensal,
                       totalAtual: totalMes,
                       mesAtual: mesCapital,
+                      mesAnterior: referenciaMesAnterior,
                       temMesAnterior: totalAnterior > 0,
                       meta: meta,
                       onDefinirMeta: abrirDialogMeta,
@@ -202,6 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                   Expanded(
                     child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 96),
                       itemCount: ganhos.length,
                       itemBuilder: (context, index) {
                         final ganho = ganhos[index];
@@ -221,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   SizedBox(height: 20),
                                 ],
                               ),
-
+                              SizedBox(width: 5),
                               Text(
                                 ganho.formatedValue,
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -235,11 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       showDialog(
                                         context: context,
                                         builder: (_) {
-                                          return AlertDialog(
-                                            content: Ganhoformpage(
-                                              ganho: ganho,
-                                            ),
-                                          );
+                                          return Ganhoformpage(ganho: ganho);
                                         },
                                       );
                                     },
@@ -267,7 +282,7 @@ class _MyHomePageState extends State<MyHomePage> {
           showDialog(
             context: context,
             builder: (_) {
-              return AlertDialog(content: Ganhoformpage());
+              return Ganhoformpage();
             },
           );
         },

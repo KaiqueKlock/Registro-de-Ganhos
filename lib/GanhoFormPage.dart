@@ -4,107 +4,112 @@ import 'package:intl/intl.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 import 'package:registro_de_ganhos/Utils/validator.dart';
-import 'package:registro_de_ganhos/Widgets/user_inputs.dart';
 import 'package:uuid/uuid.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-
-
 
 class Ganhoformpage extends StatefulWidget {
   final Ganho? ganho;
   final uuid = Uuid();
- Ganhoformpage({super.key, this.ganho});
-  
+
+  Ganhoformpage({super.key, this.ganho});
+
   @override
   State<Ganhoformpage> createState() => _AddPageState();
 }
-
 
 class _AddPageState extends State<Ganhoformpage> {
   late TextEditingController doublecontroller = TextEditingController();
   late TextEditingController descriptionController = TextEditingController();
 
-    final formKey = GlobalKey<FormState>();
-  
-@override
-void initState() {
-  super.initState();
+  final formKey = GlobalKey<FormState>();
 
-  final format = NumberFormat.currency(
-    locale: 'pt_BR',
-    symbol: 'R\$',
-  );
+  @override
+  void initState() {
+    super.initState();
 
-  if (widget.ganho != null) {
-    doublecontroller = TextEditingController(
-      text: format.format(widget.ganho!.value),
-    );
+    final format = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
-    descriptionController = TextEditingController(
-      text: widget.ganho!.description,
-    );
-  } else {
-    doublecontroller = TextEditingController();
-    descriptionController = TextEditingController();
+    if (widget.ganho != null) {
+      doublecontroller = TextEditingController(
+        text: format.format(widget.ganho!.value),
+      );
+
+      descriptionController = TextEditingController(
+        text: widget.ganho!.description,
+      );
+    } else {
+      doublecontroller = TextEditingController();
+      descriptionController = TextEditingController();
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
+    void validate(BuildContext context) {
+      if (formKey.currentState!.validate()) {
+        final format = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+        final parsedValue = format.parse(doublecontroller.text).toDouble();
 
+        if (widget.ganho == null) {
+          final novoGanho = Ganho(
+            id: widget.uuid.v4(),
+            value: parsedValue,
+            description: descriptionController.text,
+            data: DateTime.now(),
+          );
+          Hive.box<Ganho>('ganhos').add(novoGanho);
+        } else {
+          widget.ganho!
+            ..value = parsedValue
+            ..description = descriptionController.text
+            ..data = DateTime.now();
+          widget.ganho!.save();
+        }
 
-
-    void validate(context) {
-      
-          if (formKey.currentState!.validate()) {
-        final format = NumberFormat.currency(
-      locale: 'pt_BR',
-      symbol: 'R\$',
-    );
-
-    final parsedValue =
-        format.parse(doublecontroller.text).toDouble();
-
-        if(widget.ganho == null){
-             final novoGanho = Ganho(
-                id: widget.uuid.v4(),
-                value: parsedValue,
-                description: descriptionController.text,
-                data: DateTime.now(),
-              ); 
-             Hive.box<Ganho>('ganhos').add(novoGanho); 
-            } else{ widget.ganho!
-              ..value = parsedValue
-              ..description = descriptionController.text
-              ..data = DateTime.now();
-              widget.ganho!.save();
-              }
         Navigator.pop(context);
       }
     }
-    
-    return Form(
-      key: formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-      Inputs(labelText:'Descrição', date: DateTime.now(), controller: descriptionController, keyboardType: TextInputType.text, validator: (value){
-        if(value!.length > 12){
-          return 'A descrição deve conter no máximo 12 caracteres.';
-        }
-      }), // campo para add descrição
-      SizedBox(height: 20,),
-      Inputs(labelText:'Valor', hintText: 'R\$ 0.0', date: DateTime.now(), controller: doublecontroller, inputFormatter: CurrencyFormatter(), keyboardType: TextInputType.number, validator: Validator.validateValue ), // campo para add valor
-      IconButton(
-        icon: Icon(Icons.save_outlined, size: 50),
-             onPressed: () => validate(context),
-            
+
+    return AlertDialog(
+      title: Text(widget.ganho == null ? 'Adicionar ganho' : 'Editar ganho'),
+      content: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: descriptionController,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                hintText: 'Descrição',
+              ),
+              validator: (value) {
+                if (value != null && value.isNotEmpty && value.length > 12) {
+                  return 'A descrição deve conter no maximo 12 caracteres.';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: doublecontroller,
+              inputFormatters: [CurrencyFormatter()],
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(hintText: 'R\$ 0,00'),
+              validator: Validator.validateValue,
+            ),
+          ],
+        ),
       ),
-        ],
-      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () => validate(context),
+          child: const Text('Salvar'),
+        ),
+      ],
     );
   }
 }

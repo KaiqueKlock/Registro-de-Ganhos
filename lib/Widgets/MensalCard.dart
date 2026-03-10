@@ -9,6 +9,7 @@ class MetaMensalCard extends StatelessWidget {
   final double percentualMeta;
   final double percentualCrescimento;
   final String mesAtual;
+  final String mesAnterior;
   final bool temMesAnterior;
 
   const MetaMensalCard({
@@ -20,6 +21,7 @@ class MetaMensalCard extends StatelessWidget {
     required this.percentualMeta,
     required this.percentualCrescimento,
     required this.mesAtual,
+    required this.mesAnterior,
     required this.temMesAnterior,
   });
 
@@ -42,6 +44,8 @@ class MetaMensalCard extends StatelessWidget {
     }
 
     final bool exibeComparacao = totalAtual > 0 && temMesAnterior;
+    final bool quedaRelevante = percentualCrescimento <= -50;
+    final bool estadoNeutro = percentualCrescimento < 0 && !quedaRelevante;
     final String crescimentoTexto;
     if (totalAtual == 0) {
       crescimentoTexto = 'Sem registros';
@@ -61,16 +65,25 @@ class MetaMensalCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              height: 40,
+              height: 48,
               child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  const Align(
-                    alignment: Alignment.center,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Text(
-                      'Meta',
+                      mesAtual.toUpperCase(),
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ),
@@ -93,21 +106,10 @@ class MetaMensalCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                mesAtual.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
+            const SizedBox(height: 2),
+            const Text(
+              'Meta',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
             Text(
@@ -122,15 +124,34 @@ class MetaMensalCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(
+                    estadoNeutro
+                        ? Icons.trending_flat
+                        : percentualCrescimento >= 0
+                        ? Icons.trending_up
+                        : Icons.trending_down,
+                    size: 16,
+                    color: estadoNeutro
+                        ? Colors.grey
+                        : percentualCrescimento >= 0
+                        ? Colors.green
+                        : Colors.red,
+                  ),
+                  const SizedBox(width: 4),
                   Text(
-                    crescimentoTexto,
-                    style: const TextStyle(
+                    estadoNeutro ? 'Em linha' : crescimentoTexto,
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
+                      color: estadoNeutro
+                          ? Colors.grey
+                          : percentualCrescimento >= 0
+                          ? Colors.green
+                          : Colors.red,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  const Text('vs mes anterior', style: TextStyle(fontSize: 11)),
+                  const SizedBox(width: 4),
+                  Text('vs $mesAnterior', style: const TextStyle(fontSize: 11)),
                 ],
               )
             else
