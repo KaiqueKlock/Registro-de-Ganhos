@@ -79,11 +79,11 @@ class MetaMensalCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      mesAtual.toUpperCase(),
+                      mesAtual,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                       ),
                     ),
                   ),
@@ -139,7 +139,7 @@ class MetaMensalCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    estadoNeutro ? 'Em linha' : crescimentoTexto,
+                    estadoNeutro ? ' ' : crescimentoTexto,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,

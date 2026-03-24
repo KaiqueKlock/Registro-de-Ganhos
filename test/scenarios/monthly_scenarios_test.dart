@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/GanhoService.dart';
@@ -165,6 +164,36 @@ void main() {
         expect(totalMar, 150);
         expect(totalFev, 0);
         expect(crescimento, 0);
+      },
+    );
+
+    test(
+      'um unico ganho no dia 20 do mes passado e novos ganhos no mes atual calcula comparacao corretamente',
+      () {
+        final ganhos = <Ganho>[
+          _ganho(id: 'fev20', data: DateTime(2026, 2, 20, 10), value: 500),
+          _ganho(id: 'mar05', data: DateTime(2026, 3, 5, 10), value: 100),
+          _ganho(id: 'mar09', data: DateTime(2026, 3, 9, 10), value: 200),
+        ];
+
+        final totalAtual = GanhoService.calculateGanhoPorMes(ganhos, 2026, 3);
+        final totalAnterior = GanhoService.calculateGanhoPorMes(
+          ganhos,
+          2026,
+          2,
+        );
+        final crescimento = GanhoService.calculateCrescimentoComReferencia(
+          totalAtual,
+          totalAnterior,
+          referencia: DateTime(2026, 3, 10),
+        );
+
+        final esperado = ((300 - (500 * (10 / 31))) / (500 * (10 / 31))) * 100;
+
+        expect(totalAtual, 300);
+        expect(totalAnterior, 500);
+        expect(crescimento, closeTo(esperado, 0.0001));
+        expect(crescimento, greaterThan(0));
       },
     );
   });

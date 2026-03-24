@@ -27,13 +27,17 @@ class CurrencyFormatter extends TextInputFormatter {
     }   
 
     static double parseCurrency(String value) {
-  return double.parse(
-    value
+  final sanitizedValue = value
       .replaceAll("R\$", "")
       .replaceAll(".", "")
       .replaceAll(",", ".")
-      .trim(),
-  );
+      .trim();
+
+  if (sanitizedValue.isEmpty) {
+    return 0;
+  }
+
+  return double.tryParse(sanitizedValue) ?? 0;
 }
 
 static String formatCurrency(double value) {

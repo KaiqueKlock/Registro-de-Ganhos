@@ -25,6 +25,22 @@ void main() {
       expect(total, 300);
     });
 
+    test('calculateGanho inclui item no inicio e exclui item no fim', () {
+      final ganhos = [
+        _g(DateTime(2026, 3, 1, 0, 0, 0), 100, 'inicio'),
+        _g(DateTime(2026, 3, 31, 23, 59), 200, 'meio'),
+        _g(DateTime(2026, 4, 1, 0, 0, 0), 300, 'fim'),
+      ];
+
+      final total = GanhoService.calculateGanho(
+        ganhos,
+        DateTime(2026, 3, 1, 0, 0, 0),
+        DateTime(2026, 4, 1, 0, 0, 0),
+      );
+
+      expect(total, 300);
+    });
+
     test('calculateGanhoPorMes retorna apenas do mes solicitado', () {
       final ganhos = [
         _g(DateTime(2026, 2, 10, 8), 100, '1'),
@@ -34,6 +50,50 @@ void main() {
 
       final totalMarco = GanhoService.calculateGanhoPorMes(ganhos, 2026, 3);
       expect(totalMarco, 300);
+    });
+
+    test('calculateGanhoDiario usa referencia recebida', () {
+      final ganhos = [
+        _g(DateTime(2026, 3, 10, 8), 120, '1'),
+        _g(DateTime(2026, 3, 10, 20), 80, '2'),
+        _g(DateTime(2026, 3, 11, 9), 200, '3'),
+      ];
+
+      final totalDia = GanhoService.calculateGanhoDiario(
+        ganhos,
+        referencia: DateTime(2026, 3, 10, 12),
+      );
+
+      expect(totalDia, 200);
+    });
+
+    test('calculateGanhoSemanal usa referencia recebida', () {
+      final ganhos = [
+        _g(DateTime(2026, 3, 9, 10), 100, 'seg'),
+        _g(DateTime(2026, 3, 12, 10), 150, 'qui'),
+        _g(DateTime(2026, 3, 16, 10), 300, 'prox-seg'),
+      ];
+
+      final totalSemana = GanhoService.calculateGanhoSemanal(
+        ganhos,
+        referencia: DateTime(2026, 3, 12, 11),
+      );
+
+      expect(totalSemana, 250);
+    });
+
+    test('calculateGanhoMensal usa referencia recebida', () {
+      final ganhos = [
+        _g(DateTime(2026, 2, 10, 8), 100, '1'),
+        _g(DateTime(2026, 3, 10, 8), 250, '2'),
+      ];
+
+      final totalMensal = GanhoService.calculateGanhoMensal(
+        ganhos,
+        referencia: DateTime(2026, 2, 20),
+      );
+
+      expect(totalMensal, 100);
     });
 
     test('calculateCrescimento retorna 0 quando anterior for 0', () {

@@ -21,6 +21,11 @@ void main() {
       );
     });
 
+    test('retorna erro para entrada sem digitos sem lancar excecao', () {
+      expect(() => Validator.validateValue('abc'), returnsNormally);
+      expect(Validator.validateValue('abc'), 'Número inválido');
+    });
+
     test('retorna null para valor valido', () {
       expect(Validator.validateValue('R\$ 123,45'), isNull);
     });

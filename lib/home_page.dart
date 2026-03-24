@@ -62,7 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   _metaController.text,
                 );
 
-                box.put(key, metaDigitada);
+                if (metaDigitada <= 0) {
+                  box.delete(key);
+                } else {
+                  box.put(key, metaDigitada);
+                }
 
                 Navigator.pop(context);
               },

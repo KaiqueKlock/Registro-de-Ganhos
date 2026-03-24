@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 
@@ -7,6 +6,16 @@ void main() {
     test('parseCurrency converte string monetaria em double', () {
       final value = CurrencyFormatter.parseCurrency('R\$ 1.234,56');
       expect(value, 1234.56);
+    });
+
+    test('parseCurrency retorna zero para string vazia', () {
+      final value = CurrencyFormatter.parseCurrency('');
+      expect(value, 0);
+    });
+
+    test('parseCurrency retorna zero para entrada invalida', () {
+      final value = CurrencyFormatter.parseCurrency('abc');
+      expect(value, 0);
     });
 
     test('formatCurrency formata double para moeda BRL', () {

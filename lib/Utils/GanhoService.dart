@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 
-final now = DateTime.now();
-
 class GanhoService {
   static double calculateGanho(
     List<Ganho> ganhos,
@@ -10,20 +8,28 @@ class GanhoService {
     DateTime fim,
   ) {
     final filteredGanhos = ganhos.where(
-      (ganho) => ganho.data.isAfter(inicio) && ganho.data.isBefore(fim),
+      (ganho) => !ganho.data.isBefore(inicio) && ganho.data.isBefore(fim),
     );
 
     return filteredGanhos.fold(0.0, (total, ganho) => total + ganho.value);
   }
 
-  static double calculateGanhoDiario(List<Ganho> ganhos) {
+  static double calculateGanhoDiario(
+    List<Ganho> ganhos, {
+    DateTime? referencia,
+  }) {
+    final now = referencia ?? DateTime.now();
     final inicio = DateTime(now.year, now.month, now.day);
     final fim = inicio.add(const Duration(days: 1));
 
     return calculateGanho(ganhos, inicio, fim);
   }
 
-  static double calculateGanhoSemanal(List<Ganho> ganhos) {
+  static double calculateGanhoSemanal(
+    List<Ganho> ganhos, {
+    DateTime? referencia,
+  }) {
+    final now = referencia ?? DateTime.now();
     final iniciodaSemana = now.subtract(
       Duration(days: now.weekday - 1),
     ); // Início da semana (segunda-feira)
@@ -44,7 +50,11 @@ class GanhoService {
     return calculateGanho(ganhos, inicio, fim);
   }
 
-  static double calculateGanhoMensal(List<Ganho> ganhos) {
+  static double calculateGanhoMensal(
+    List<Ganho> ganhos, {
+    DateTime? referencia,
+  }) {
+    final now = referencia ?? DateTime.now();
     return calculateGanhoPorMes(ganhos, now.year, now.month);
   }
 

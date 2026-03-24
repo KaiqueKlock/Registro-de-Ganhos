@@ -60,8 +60,7 @@ class _AddPageState extends State<Ganhoformpage> {
         } else {
           widget.ganho!
             ..value = parsedValue
-            ..description = descriptionController.text
-            ..data = DateTime.now();
+            ..description = descriptionController.text;
           widget.ganho!.save();
         }
 
