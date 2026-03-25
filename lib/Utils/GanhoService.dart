@@ -80,4 +80,31 @@ class GanhoService {
 
     return ((atual - metaAjustada) / metaAjustada) * 100;
   }
+
+  static double calculateCrescimentoPorCiclo(
+    double atual,
+    double anterior, {
+    required DateTime referencia,
+    required DateTime cicloInicio,
+    required DateTime cicloFimExclusivo,
+  }) {
+    if (anterior == 0) return 0;
+
+    final totalDias = cicloFimExclusivo.difference(cicloInicio).inDays;
+    if (totalDias <= 0) return 0;
+
+    final referenciaDia = DateTime(
+      referencia.year,
+      referencia.month,
+      referencia.day,
+    );
+    final diasDecorridos =
+        referenciaDia.difference(cicloInicio).inDays.clamp(0, totalDias - 1) +
+        1;
+    final percentualDecorrido = diasDecorridos / totalDias;
+    final metaAjustada = anterior * percentualDecorrido;
+
+    if (metaAjustada == 0) return 0;
+    return ((atual - metaAjustada) / metaAjustada) * 100;
+  }
 }

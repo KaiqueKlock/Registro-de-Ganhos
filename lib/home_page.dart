@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:registro_de_ganhos/GanhoFormPage.dart';
 import 'package:registro_de_ganhos/Models/ganho.dart';
 import 'package:registro_de_ganhos/Utils/GanhoService.dart';
+import 'package:registro_de_ganhos/Utils/billing_cycle_utils.dart';
 import 'package:registro_de_ganhos/Utils/currency_formatter.dart';
 import 'package:registro_de_ganhos/Utils/goalUtils.dart';
 import 'package:registro_de_ganhos/Utils/monthly_history_service.dart';
@@ -30,7 +31,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void abrirDialogMeta() {
     final box = Hive.box('settings');
     final now = DateTime.now();
-    final key = Goalutils.goalKey(now);
+    final closingDay = Goalutils.readClosingDay(box);
+    final currentCycle = BillingCycleUtils.cycleForDate(now, closingDay);
+    final key = Goalutils.goalKeyForCycle(currentCycle);
     final double? metaAtual = box.get(key);
 
     final metaController = TextEditingController(
@@ -44,7 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context) {
         return AlertDialog(
           title: Text(
-            metaAtual == null ? 'Definir Meta Mensal' : 'Editar Meta Mensal',
+            metaAtual == null
+                ? 'Definir Meta do Ciclo'
+                : 'Editar Meta do Ciclo',
           ),
           content: TextFormField(
             inputFormatters: [CurrencyFormatter()],
@@ -79,6 +84,87 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void abrirDialogFechamento() {
+    final settingsBox = Hive.box('settings');
+    final now = DateTime.now();
+    int selectedDay = Goalutils.readClosingDay(settingsBox);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            final nextStart = BillingCycleUtils.nextCycleStart(
+              now,
+              selectedDay,
+            );
+            final nextStartLabel = DateFormat('dd/MM').format(nextStart);
+
+            return AlertDialog(
+              title: const Text('Fechamento mensal'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Dia de fechamento:'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<int>(
+                    initialValue: selectedDay,
+                    items: List.generate(
+                      31,
+                      (index) => DropdownMenuItem(
+                        value: index + 1,
+                        child: Text('Dia ${index + 1}'),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setStateDialog(() {
+                        selectedDay = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Text('Novo mes inicia em: $nextStartLabel'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Goalutils.saveClosingDay(settingsBox, selectedDay);
+                    Navigator.pop(context);
+
+                    final savedNextStart = BillingCycleUtils.nextCycleStart(
+                      DateTime.now(),
+                      selectedDay,
+                    );
+                    final savedNextStartLabel = DateFormat(
+                      'dd/MM',
+                    ).format(savedNextStart);
+
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Fechamento atualizado. Novo mes inicia em: $savedNextStartLabel',
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _colorTile(Color color, String label) {
     return ListTile(
       leading: CircleAvatar(backgroundColor: color),
@@ -90,29 +176,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _openMonthRecordsDialog(MonthlyHistoryEntry entry, List<Ganho> ganhos) {
-    final records = MonthlyHistoryService.monthRecords(
-      ganhos,
-      year: entry.year,
-      month: entry.month,
-    );
-    final monthName = DateFormat(
-      'MMMM',
-      'pt_BR',
-    ).format(DateTime(entry.year, entry.month));
-    final monthLabel = monthName[0].toUpperCase() + monthName.substring(1);
+  void _openCycleRecordsDialog(MonthlyHistoryEntry entry, List<Ganho> ganhos) {
+    final records = MonthlyHistoryService.monthRecordsByEntry(ganhos, entry);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Registros de $monthLabel/${entry.year}'),
+          title: Text('Registros ${entry.periodLabel}'),
           content: SizedBox(
             width: double.maxFinite,
             height: 300,
             child: records.isEmpty
                 ? const Center(
-                    child: Text('Nenhum registro encontrado para este mês'),
+                    child: Text('Nenhum registro encontrado para este ciclo'),
                   )
                 : ListView.separated(
                     itemCount: records.length,
@@ -120,7 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     itemBuilder: (context, index) {
                       final ganho = records[index];
                       final description = ganho.description.trim().isEmpty
-                          ? 'Sem descrição'
+                          ? 'Sem descricao'
                           : ganho.description;
 
                       return ListTile(
@@ -154,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return const [
         ListTile(
           title: Text('Meses anteriores'),
-          subtitle: Text('Nenhum mês encerrado ainda'),
+          subtitle: Text('Nenhum mes encerrado ainda'),
         ),
       ];
     }
@@ -166,8 +243,9 @@ class _MyHomePageState extends State<MyHomePage> {
           dense: true,
           visualDensity: VisualDensity.compact,
           title: Text(entry.formattedLine),
+          subtitle: Text(entry.periodLabel),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => _openMonthRecordsDialog(entry, ganhos),
+          onTap: () => _openCycleRecordsDialog(entry, ganhos),
         ),
       ),
     ];
@@ -187,28 +265,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 valueListenable: Hive.box('settings').listenable(),
                 builder: (context, Box settingsBox, _) {
                   final drawerGanhos = ganhosBox.values.toList();
+                  final closingDay = Goalutils.readClosingDay(settingsBox);
+                  final nextStart = BillingCycleUtils.nextCycleStart(
+                    DateTime.now(),
+                    closingDay,
+                  );
+                  final nextStartLabel = DateFormat('dd/MM').format(nextStart);
+
                   final history = MonthlyHistoryService.syncAndLoadHistory(
                     settingsBox,
                     drawerGanhos,
                     referencia: DateTime.now(),
+                    closingDay: closingDay,
                   );
 
                   return ListView(
                     children: [
-                      const ListTile(title: Text('Configurações')),
+                      const ListTile(title: Text('Configuracoes')),
                       ListTile(
                         leading: Icon(
                           isDarkTheme ? Icons.light_mode : Icons.dark_mode,
                         ),
+                        title: const Text('Tema'),
                         onTap: () {
                           widget.toggleTheme();
                           Navigator.pop(context);
                         },
                       ),
+                      ListTile(
+                        leading: const Icon(Icons.calendar_month),
+                        title: Text('Fechamento: dia $closingDay'),
+                        subtitle: Text('Novo mes inicia em: $nextStartLabel'),
+                        onTap: abrirDialogFechamento,
+                      ),
                       const Divider(),
                       ExpansionTile(
                         leading: const Icon(Icons.palette),
-                        title: const Text('Seleção de Cor'),
+                        title: const Text('Selecao de cor'),
                         children: [
                           _colorTile(
                             const Color.fromARGB(255, 69, 4, 80),
@@ -263,45 +356,47 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, Box settingsBox, _) {
               final ganhos = ganhosBox.values.toList();
               final now = DateTime.now();
-              final mes = DateFormat('MMMM', 'pt_BR').format(now);
-              final mesCapital = mes[0].toUpperCase() + mes.substring(1);
-              final mesAnteriorData = DateTime(now.year, now.month - 1);
-              final mesAnteriorNome = DateFormat(
-                'MMMM',
-                'pt_BR',
-              ).format(mesAnteriorData);
-              final mesAnteriorCapital =
-                  mesAnteriorNome[0].toUpperCase() +
-                  mesAnteriorNome.substring(1);
-              final diaMaxMesAnterior = DateUtils.getDaysInMonth(
-                mesAnteriorData.year,
-                mesAnteriorData.month,
-              );
-              final diaReferencia = now.day > diaMaxMesAnterior
-                  ? diaMaxMesAnterior
-                  : now.day;
-              final referenciaMesAnterior =
-                  '${diaReferencia.toString().padLeft(2, '0')}/$mesAnteriorCapital';
+              final closingDay = Goalutils.readClosingDay(settingsBox);
 
-              final key = Goalutils.goalKey(now);
+              final currentCycle = BillingCycleUtils.cycleForDate(
+                now,
+                closingDay,
+              );
+              final previousCycle = BillingCycleUtils.previousCycle(
+                now,
+                closingDay,
+              );
+
+              final currentCycleLabel = BillingCycleUtils.periodLabel(
+                currentCycle,
+              );
+              final previousCycleLabel = BillingCycleUtils.periodLabel(
+                previousCycle,
+              );
+
+              final key = Goalutils.goalKeyForCycle(currentCycle);
               final meta = settingsBox.get(key);
 
-              final totalMes = GanhoService.calculateGanhoPorMes(
+              final totalMes = GanhoService.calculateGanho(
                 ganhos,
-                now.year,
-                now.month,
+                currentCycle.start,
+                currentCycle.endExclusive,
               );
 
-              final totalAnterior = GanhoService.calculateGanhoPorMes(
+              final totalAnterior = GanhoService.calculateGanho(
                 ganhos,
-                mesAnteriorData.year,
-                mesAnteriorData.month,
+                previousCycle.start,
+                previousCycle.endExclusive,
               );
 
-              final crescimentoMensal = GanhoService.calculateCrescimento(
-                totalMes,
-                totalAnterior,
-              );
+              final crescimentoMensal =
+                  GanhoService.calculateCrescimentoPorCiclo(
+                    totalMes,
+                    totalAnterior,
+                    referencia: now,
+                    cicloInicio: currentCycle.start,
+                    cicloFimExclusivo: currentCycle.endExclusive,
+                  );
 
               final percentualMeta = (meta != null && meta > 0)
                   ? (totalMes / meta)
@@ -329,7 +424,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   style: const TextStyle(fontSize: 24),
                                   textAlign: TextAlign.center,
                                 ),
-                                Text(mesCapital, textAlign: TextAlign.center),
+                                Text(
+                                  currentCycleLabel,
+                                  textAlign: TextAlign.center,
+                                ),
                               ],
                             ),
                             Align(
@@ -348,8 +446,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       percentualMeta: percentualMeta,
                       percentualCrescimento: crescimentoMensal,
                       totalAtual: totalMes,
-                      mesAtual: mesCapital,
-                      mesAnterior: referenciaMesAnterior,
+                      mesAtual: currentCycleLabel,
+                      mesAnterior: previousCycleLabel,
                       temMesAnterior: totalAnterior > 0,
                       meta: meta,
                       onDefinirMeta: abrirDialogMeta,

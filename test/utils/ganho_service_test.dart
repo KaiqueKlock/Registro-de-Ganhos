@@ -142,5 +142,36 @@ void main() {
         expect(resultado, closeTo(-22.5, 0.5));
       },
     );
+
+    test(
+      'calculateCrescimentoPorCiclo considera progresso dentro do ciclo',
+      () {
+        // Ciclo de 25/03 a 24/04 tem 31 dias.
+        // Em 10/04: passaram 17 dias.
+        // Meta ajustada = 3100 * (17/31) = 1700.
+        // Crescimento = (1500-1700)/1700 = -11.76%.
+        final resultado = GanhoService.calculateCrescimentoPorCiclo(
+          1500,
+          3100,
+          referencia: DateTime(2026, 4, 10),
+          cicloInicio: DateTime(2026, 3, 25),
+          cicloFimExclusivo: DateTime(2026, 4, 25),
+        );
+
+        expect(resultado, closeTo(-11.76, 0.1));
+      },
+    );
+
+    test('calculateCrescimentoPorCiclo retorna 0 quando anterior for 0', () {
+      final resultado = GanhoService.calculateCrescimentoPorCiclo(
+        1000,
+        0,
+        referencia: DateTime(2026, 4, 10),
+        cicloInicio: DateTime(2026, 3, 25),
+        cicloFimExclusivo: DateTime(2026, 4, 25),
+      );
+
+      expect(resultado, 0);
+    });
   });
 }
