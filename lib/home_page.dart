@@ -90,7 +90,66 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<Widget> _buildPastMonthsTiles(List<MonthlyHistoryEntry> history) {
+  void _openMonthRecordsDialog(MonthlyHistoryEntry entry, List<Ganho> ganhos) {
+    final records = MonthlyHistoryService.monthRecords(
+      ganhos,
+      year: entry.year,
+      month: entry.month,
+    );
+    final monthName = DateFormat(
+      'MMMM',
+      'pt_BR',
+    ).format(DateTime(entry.year, entry.month));
+    final monthLabel = monthName[0].toUpperCase() + monthName.substring(1);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Registros de $monthLabel/${entry.year}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300,
+            child: records.isEmpty
+                ? const Center(
+                    child: Text('Nenhum registro encontrado para este mês'),
+                  )
+                : ListView.separated(
+                    itemCount: records.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final ganho = records[index];
+                      final description = ganho.description.trim().isEmpty
+                          ? 'Sem descrição'
+                          : ganho.description;
+
+                      return ListTile(
+                        dense: true,
+                        title: Text(description),
+                        subtitle: Text(ganho.formatedDate),
+                        trailing: Text(
+                          ganho.formatedValue,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Fechar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<Widget> _buildPastMonthsTiles(
+    List<MonthlyHistoryEntry> history,
+    List<Ganho> ganhos,
+  ) {
     if (history.isEmpty) {
       return const [
         ListTile(
@@ -107,6 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
           dense: true,
           visualDensity: VisualDensity.compact,
           title: Text(entry.formattedLine),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _openMonthRecordsDialog(entry, ganhos),
         ),
       ),
     ];
@@ -125,9 +186,10 @@ class _MyHomePageState extends State<MyHomePage> {
               return ValueListenableBuilder(
                 valueListenable: Hive.box('settings').listenable(),
                 builder: (context, Box settingsBox, _) {
+                  final drawerGanhos = ganhosBox.values.toList();
                   final history = MonthlyHistoryService.syncAndLoadHistory(
                     settingsBox,
-                    ganhosBox.values.toList(),
+                    drawerGanhos,
                     referencia: DateTime.now(),
                   );
 
@@ -179,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                       const Divider(),
-                      ..._buildPastMonthsTiles(history),
+                      ..._buildPastMonthsTiles(history, drawerGanhos),
                     ],
                   );
                 },

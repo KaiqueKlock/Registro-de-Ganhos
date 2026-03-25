@@ -44,5 +44,26 @@ void main() {
       expect(restored[1].month, 1);
       expect(restored[1].total, 800);
     });
+
+    test(
+      'retorna registros do mes solicitado em ordem decrescente de data',
+      () {
+        final ganhos = [
+          _g(id: 'jan1', data: DateTime(2026, 1, 2, 8), value: 100),
+          _g(id: 'jan2', data: DateTime(2026, 1, 12, 8), value: 200),
+          _g(id: 'fev1', data: DateTime(2026, 2, 10, 8), value: 300),
+        ];
+
+        final records = MonthlyHistoryService.monthRecords(
+          ganhos,
+          year: 2026,
+          month: 1,
+        );
+
+        expect(records.length, 2);
+        expect(records[0].id, 'jan2');
+        expect(records[1].id, 'jan1');
+      },
+    );
   });
 }

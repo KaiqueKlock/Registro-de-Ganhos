@@ -114,6 +114,19 @@ class MonthlyHistoryService {
     return calculated;
   }
 
+  static List<Ganho> monthRecords(
+    List<Ganho> ganhos, {
+    required int year,
+    required int month,
+  }) {
+    final records = ganhos.where((ganho) {
+      return ganho.data.year == year && ganho.data.month == month;
+    }).toList();
+
+    records.sort((a, b) => b.data.compareTo(a.data));
+    return records;
+  }
+
   static bool _sameSerializedHistory(
     List<Map<String, dynamic>> current,
     List<Map<String, dynamic>> next,
