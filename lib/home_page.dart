@@ -192,16 +192,36 @@ class _MyHomePageState extends State<MyHomePage> {
                   if (meta == null)
                     Card.outlined(
                       margin: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ListTile(
-                        title: Text(
-                          CurrencyFormatter.format(totalMes),
-                          style: TextStyle(fontSize: 24),
-                          textAlign: TextAlign.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 12.0,
                         ),
-                        subtitle: Text(mesCapital, textAlign: TextAlign.center),
-                        trailing: TextButton(
-                          onPressed: abrirDialogMeta,
-                          child: const Text('Definir meta'),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  CurrencyFormatter.format(totalMes),
+                                  style: TextStyle(fontSize: 24),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  mesCapital,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: abrirDialogMeta,
+                                child: const Text('Definir meta'),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     )
