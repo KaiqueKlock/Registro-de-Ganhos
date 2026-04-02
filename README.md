@@ -1,4 +1,8 @@
 # 📱 App de Ganhos Diários
+![Mídia (55)](https://github.com/user-attachments/assets/cb67d59e-a650-4d76-880c-87c917e8adf2)
+![Mídia (54)](https://github.com/user-attachments/assets/395aa4bc-66da-486c-8c2a-a8694588c65a)
+![Mídia (53)](https://github.com/user-attachments/assets/76eab94a-c929-4eb8-afd9-936031a8faba)
+
 
 Aplicativo mobile desenvolvido em **Flutter** para registrar e acompanhar ganhos financeiros diários, permitindo visualizar resultados mensais de forma simples e organizada.
 
